@@ -12,7 +12,7 @@ import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 
 public class RebuiltBall extends GamePieceOnFieldSimulation {
 
-  public static final GamePieceInfo INFINITE_RECHARGE_BALL_INFO =
+  public static final GamePieceInfo kRebuiltBallInfo =
       new GamePieceInfo(
           "Ball",
           Geometry.createCircle(Units.inchesToMeters(5.91) / 2),
@@ -23,6 +23,6 @@ public class RebuiltBall extends GamePieceOnFieldSimulation {
           0.3);
 
   public RebuiltBall(Translation2d initialPosition) {
-    super(INFINITE_RECHARGE_BALL_INFO, new Pose2d(initialPosition, new Rotation2d()));
+    super(kRebuiltBallInfo, new Pose2d(initialPosition, new Rotation2d()));
   }
 }
