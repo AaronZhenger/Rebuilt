@@ -68,6 +68,12 @@ public final class Constants {
 
   public static double kTurretAngleMultiplier = 0.07;
 
+  public static boolean disableHAL = false;
+
+  public static void disableHAL() {
+    disableHAL = true;
+  }
+
   public static class DriverConstants {
     public static final int kDriverJoystickPort = 0;
     public static final int kOperatorJoystickPort = 1;
