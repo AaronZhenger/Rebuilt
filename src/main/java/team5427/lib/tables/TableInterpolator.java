@@ -1,15 +1,14 @@
+/* (C)2026 */
 package team5427.lib.tables;
 
 import edu.wpi.first.math.interpolation.Interpolator;
-import team5427.lib.detection.tuples.Tuple3Plus;
 
 public class TableInterpolator implements Interpolator<Double> {
 
-    //60 - 70 .5
+    // 60 - 70 .5
     @Override
     public Double interpolate(Double startValue, Double endValue, double t) {
-        Double interpolatedValue = startValue+(endValue-startValue)*t;
+        Double interpolatedValue = startValue + (endValue - startValue) * t;
         return interpolatedValue;
     }
-    
 }

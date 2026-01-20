@@ -1,18 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+/* (C)2026 */
 package team5427.frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.controllers.PathFollowingController;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -37,105 +31,111 @@ import team5427.frc.robot.subsystems.vision.io.QuestNav;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private SendableChooser<Command> autoChooser;
+    private SendableChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    public RobotContainer() {
 
-    try {
-      Constants.config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      System.out.println("Robot Config not loading from GUI Settings");
-      e.printStackTrace();
-      return;
+        try {
+            Constants.config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            System.out.println("Robot Config not loading from GUI Settings");
+            e.printStackTrace();
+            return;
+        }
+
+        switch (Constants.currentMode) {
+            case REAL:
+                SwerveSubsystem.getInstance(RobotPose.getInstance()::addOdometryMeasurement);
+                IntakeSubsystem.getInstance();
+                break;
+            case REPLAY:
+                SwerveSubsystem.getInstance(RobotPose.getInstance()::addOdometryMeasurement);
+                IntakeSubsystem.getInstance();
+                break;
+            case SIM:
+                SwerveSubsystem.getInstance(RobotPose.getInstance()::addOdometryMeasurement);
+                SimulatedArena.getInstance()
+                        .addDriveTrainSimulation(
+                                SwerveSubsystem.getInstance().getKDriveSimulation());
+                SimulatedArena.getInstance().clearGamePieces();
+                IntakeSubsystem.getInstance(SwerveSubsystem.getInstance()::getKDriveSimulation);
+                break;
+            default:
+                break;
+        }
+        VisionSubsystem.getInstance(
+                RobotPose.getInstance()::addVisionMeasurement,
+                () -> RobotPose.getInstance().getAdaptivePose(),
+                () -> RobotPose.getInstance().getGyroHeading());
+        QuestNav.getInstance().setPose(new Pose2d(10 * Math.random(), 4, Rotation2d.kZero));
+
+        AutoBuilder.configure(
+                RobotPose.getInstance()::getAdaptivePose,
+                RobotPose.getInstance()::resetAllPose,
+                SwerveSubsystem.getInstance()::getCurrentChassisSpeeds,
+                (speeds, driveFF) -> SwerveSubsystem.getInstance().setInputSpeeds(speeds, driveFF),
+                new PPHolonomicDriveController(
+                        new PIDConstants(DrivingConstants.kTranslationalKp.get(), 0.0, 0.0),
+                        new PIDConstants(DrivingConstants.kRotationKp.get(), 0.0, 0.0)),
+                Constants.config,
+                () -> {
+                    return DriverStation.getAlliance().isEmpty()
+                            && DriverStation.getAlliance().get() == Alliance.Red;
+                },
+                SwerveSubsystem.getInstance());
+
+        autoChooser = AutoBuilder.buildAutoChooser();
+
+        buttonBindings();
     }
 
-    switch (Constants.currentMode) {
-      case REAL:
-        SwerveSubsystem.getInstance(RobotPose.getInstance()::addOdometryMeasurement);
-        IntakeSubsystem.getInstance();
-        break;
-      case REPLAY:
-        SwerveSubsystem.getInstance(RobotPose.getInstance()::addOdometryMeasurement);
-        IntakeSubsystem.getInstance();
-        break;
-      case SIM:
-        SwerveSubsystem.getInstance(RobotPose.getInstance()::addOdometryMeasurement);
-        SimulatedArena.getInstance()
-            .addDriveTrainSimulation(SwerveSubsystem.getInstance().getKDriveSimulation());
-        SimulatedArena.getInstance().clearGamePieces();
-        IntakeSubsystem.getInstance(SwerveSubsystem.getInstance()::getKDriveSimulation);
-        break;
-      default:
-        break;
+    private void buttonBindings() {
+        new PilotingControls(
+                DriverProfiles.kSelectedDriverState.modeType.equals(
+                                DriverProfiles.DriverModeType.SINGLE)
+                        ? new CommandXboxController(DriverConstants.kDriverJoystickPort)
+                        : new CommandXboxController(DriverConstants.kDriverJoystickPort));
+        new OperatorControls(
+                DriverProfiles.kSelectedDriverState.modeType.equals(
+                                DriverProfiles.DriverModeType.SINGLE)
+                        ? new CommandXboxController(DriverConstants.kDriverJoystickPort)
+                        : new CommandXboxController(DriverConstants.kOperatorJoystickPort));
     }
-    VisionSubsystem.getInstance(
-        RobotPose.getInstance()::addVisionMeasurement,
-        () -> RobotPose.getInstance().getAdaptivePose(),
-        () -> RobotPose.getInstance().getGyroHeading());
-    QuestNav.getInstance().setPose(new Pose2d(10 * Math.random(), 4, Rotation2d.kZero));
 
-    AutoBuilder.configure(
-      RobotPose.getInstance()::getAdaptivePose, 
-      RobotPose.getInstance()::resetAllPose, 
-      SwerveSubsystem.getInstance()::getCurrentChassisSpeeds, 
-      (speeds, driveFF) -> SwerveSubsystem.getInstance().setInputSpeeds(speeds, driveFF), 
-      new PPHolonomicDriveController(
-        new PIDConstants(DrivingConstants.kTranslationalKp.get(), 0.0, 0.0), 
-        new PIDConstants(DrivingConstants.kRotationKp.get(), 0.0, 0.0)
-      ), 
-      Constants.config, 
-      () -> {return DriverStation.getAlliance().isEmpty()&&DriverStation.getAlliance().get() == Alliance.Red;}, 
-      SwerveSubsystem.getInstance()
-    );
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        // An example command will be run in autonomous
+        return autoChooser.getSelected();
+    }
 
-    autoChooser = AutoBuilder.buildAutoChooser();
+    public void resetSimulationField() {
+        if (Constants.currentMode != Constants.Mode.SIM) return;
+        Pose2d pose = new Pose2d(3, 3, Rotation2d.kZero);
 
-    buttonBindings();
-  }
+        SwerveSubsystem.getInstance().getKDriveSimulation().setSimulationWorldPose(pose);
+        RobotPose.getInstance().resetAllPose(pose);
+        SwerveSubsystem.getInstance().resetGyro(Rotation2d.kZero);
+        SimulatedArena.getInstance().resetFieldForAuto();
+    }
 
-  private void buttonBindings() {
-    new PilotingControls(
-        DriverProfiles.kSelectedDriverState.modeType.equals(DriverProfiles.DriverModeType.SINGLE)
-            ? new CommandXboxController(DriverConstants.kDriverJoystickPort)
-            : new CommandXboxController(DriverConstants.kDriverJoystickPort));
-    new OperatorControls(
-        DriverProfiles.kSelectedDriverState.modeType.equals(DriverProfiles.DriverModeType.SINGLE)
-            ? new CommandXboxController(DriverConstants.kDriverJoystickPort)
-            : new CommandXboxController(DriverConstants.kOperatorJoystickPort));
-  }
+    public void updateSimulation() {
+        if (Constants.currentMode != Constants.Mode.SIM) return;
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return autoChooser.getSelected();
-  }
-
-  public void resetSimulationField() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-    Pose2d pose = new Pose2d(3, 3, Rotation2d.kZero);
-
-    SwerveSubsystem.getInstance().getKDriveSimulation().setSimulationWorldPose(pose);
-    RobotPose.getInstance().resetAllPose(pose);
-    SwerveSubsystem.getInstance().resetGyro(Rotation2d.kZero);
-    SimulatedArena.getInstance().resetFieldForAuto();
-  }
-
-  public void updateSimulation() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-
-    SimulatedArena.getInstance().simulationPeriodic();
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition",
-        SwerveSubsystem.getInstance().getKDriveSimulation().getSimulatedDriveTrainPose());
-    // Logger.recordOutput(
-    //     "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    // Logger.recordOutput(
-    //     "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-    //TODO swap gamepieces
-  }
+        SimulatedArena.getInstance().simulationPeriodic();
+        Logger.recordOutput(
+                "FieldSimulation/RobotPosition",
+                SwerveSubsystem.getInstance().getKDriveSimulation().getSimulatedDriveTrainPose());
+        // Logger.recordOutput(
+        //     "FieldSimulation/Coral",
+        // SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+        // Logger.recordOutput(
+        //     "FieldSimulation/Algae",
+        // SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+        // TODO swap gamepieces
+    }
 }

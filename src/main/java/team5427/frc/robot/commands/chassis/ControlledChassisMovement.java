@@ -1,3 +1,4 @@
+/* (C)2026 */
 package team5427.frc.robot.commands.chassis;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,69 +16,73 @@ import team5427.frc.robot.subsystems.Swerve.SwerveSubsystem;
 
 public class ControlledChassisMovement extends Command {
 
-  private SwerveSubsystem swerveSubsystem;
-  private CommandXboxController joy;
+    private SwerveSubsystem swerveSubsystem;
+    private CommandXboxController joy;
 
-  private TunedJoystick translationJoystick;
-  private TunedJoystick rotationJoystick;
+    private TunedJoystick translationJoystick;
+    private TunedJoystick rotationJoystick;
 
-  private Rotation2d controlledAngle;
+    private Rotation2d controlledAngle;
 
-  public ControlledChassisMovement(CommandXboxController driverJoystick) {
-    swerveSubsystem = SwerveSubsystem.getInstance();
-    joy = driverJoystick;
-    translationJoystick = new TunedJoystick(joy.getHID());
-    translationJoystick.useResponseCurve(ResponseCurve.LINEAR);
+    public ControlledChassisMovement(CommandXboxController driverJoystick) {
+        swerveSubsystem = SwerveSubsystem.getInstance();
+        joy = driverJoystick;
+        translationJoystick = new TunedJoystick(joy.getHID());
+        translationJoystick.useResponseCurve(ResponseCurve.LINEAR);
 
-    rotationJoystick = new TunedJoystick(joy.getHID());
-    rotationJoystick.useResponseCurve(ResponseCurve.LINEAR);
+        rotationJoystick = new TunedJoystick(joy.getHID());
+        rotationJoystick.useResponseCurve(ResponseCurve.LINEAR);
 
-    translationJoystick.setDeadzone(DriverConstants.kDriverControllerJoystickDeadzone);
-    rotationJoystick.setDeadzone(
-        DriverConstants.kDriverControllerRotationalControlJoystickDeadzone);
-    addRequirements(swerveSubsystem);
+        translationJoystick.setDeadzone(DriverConstants.kDriverControllerJoystickDeadzone);
+        rotationJoystick.setDeadzone(
+                DriverConstants.kDriverControllerRotationalControlJoystickDeadzone);
+        addRequirements(swerveSubsystem);
 
-    controlledAngle = swerveSubsystem.getGyroRotationAdjusted();
-  }
-
-  @Override
-  public void initialize() {
-    controlledAngle = swerveSubsystem.getGyroRotationAdjusted();
-  }
-
-  @Override
-  public void execute() {
-    if (DriverStation.isTeleop()) {
-      double vx = -translationJoystick.getRightY();
-      double vy = -translationJoystick.getRightX();
-      double omegaRadians = -rotationJoystick.getLeftX();
-
-      double dampener = (joy.getRightTriggerAxis() * SwerveConstants.kDampenerDampeningAmount);
-
-      controlledAngle =
-          controlledAngle.plus(
-              Rotation2d.fromRadians(
-                  omegaRadians * (1 - dampener) * Constants.kLoopSpeed * Math.PI));
-      Logger.recordOutput("Controlled Angle", controlledAngle);
-      ChassisSpeeds driverSpeeds =
-          swerveSubsystem.getDriveSpeeds(vx, vy, controlledAngle, dampener);
-
-      if (joy.getLeftTriggerAxis() >= 0.1) {
-        driverSpeeds = new ChassisSpeeds(0, 0, 0);
-      }
-      swerveSubsystem.setInputSpeeds(driverSpeeds);
-    } else {
-      swerveSubsystem.setInputSpeeds(new ChassisSpeeds(0, 0, 0));
+        controlledAngle = swerveSubsystem.getGyroRotationAdjusted();
     }
-  }
 
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    @Override
+    public void initialize() {
+        controlledAngle = swerveSubsystem.getGyroRotationAdjusted();
+    }
 
-  @Override
-  public void end(boolean interrupted) {
-    swerveSubsystem.setInputSpeeds(new ChassisSpeeds());
-  }
+    @Override
+    public void execute() {
+        if (DriverStation.isTeleop()) {
+            double vx = -translationJoystick.getRightY();
+            double vy = -translationJoystick.getRightX();
+            double omegaRadians = -rotationJoystick.getLeftX();
+
+            double dampener =
+                    (joy.getRightTriggerAxis() * SwerveConstants.kDampenerDampeningAmount);
+
+            controlledAngle =
+                    controlledAngle.plus(
+                            Rotation2d.fromRadians(
+                                    omegaRadians
+                                            * (1 - dampener)
+                                            * Constants.kLoopSpeed
+                                            * Math.PI));
+            Logger.recordOutput("Controlled Angle", controlledAngle);
+            ChassisSpeeds driverSpeeds =
+                    swerveSubsystem.getDriveSpeeds(vx, vy, controlledAngle, dampener);
+
+            if (joy.getLeftTriggerAxis() >= 0.1) {
+                driverSpeeds = new ChassisSpeeds(0, 0, 0);
+            }
+            swerveSubsystem.setInputSpeeds(driverSpeeds);
+        } else {
+            swerveSubsystem.setInputSpeeds(new ChassisSpeeds(0, 0, 0));
+        }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        swerveSubsystem.setInputSpeeds(new ChassisSpeeds());
+    }
 }

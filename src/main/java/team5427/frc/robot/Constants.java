@@ -1,7 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+/* (C)2026 */
 package team5427.frc.robot;
 
 import static edu.wpi.first.units.Units.Hertz;
@@ -21,63 +18,63 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final String kCanivoreBusName = "canivore_bus_name";
-  public static final double kOdometryFrequency =
-      new CANBus(Constants.kCanivoreBusName).isNetworkFD() ? 250.0 : 100.0;
+    public static final String kCanivoreBusName = "canivore_bus_name";
+    public static final double kOdometryFrequency =
+            new CANBus(Constants.kCanivoreBusName).isNetworkFD() ? 250.0 : 100.0;
 
-  public static final Frequency kHighPriorityUpdateFrequency = Hertz.of(100.0);
-  public static final Frequency kMediumPriorityUpdateFrequency = Hertz.of(50.0);
-  public static final Frequency kLowPriorityUpdateFrequency = Hertz.of(10.0);
+    public static final Frequency kHighPriorityUpdateFrequency = Hertz.of(100.0);
+    public static final Frequency kMediumPriorityUpdateFrequency = Hertz.of(50.0);
+    public static final Frequency kLowPriorityUpdateFrequency = Hertz.of(10.0);
 
-  public static Mode currentMode = Mode.REAL;
+    public static Mode currentMode = Mode.REAL;
 
-  public static enum Mode {
-    /** Running on a real robot. */
-    REAL,
+    public static enum Mode {
+        /** Running on a real robot. */
+        REAL,
 
-    /** Running a physics simulator. */
-    SIM,
+        /** Running a physics simulator. */
+        SIM,
 
-    /** Replaying from a log file. */
-    REPLAY
-  }
+        /** Replaying from a log file. */
+        REPLAY
+    }
 
-  public static class ModeTriggers {
-    public static final Trigger kReal =
-        new Trigger(
-            () -> {
-              return currentMode.equals(Mode.REAL);
-            });
-    public static final Trigger kSim =
-        new Trigger(
-            () -> {
-              return currentMode.equals(Mode.SIM);
-            });
-    public static final Trigger kReplay =
-        new Trigger(
-            () -> {
-              return currentMode.equals(Mode.REPLAY);
-            });
-  }
+    public static class ModeTriggers {
+        public static final Trigger kReal =
+                new Trigger(
+                        () -> {
+                            return currentMode.equals(Mode.REAL);
+                        });
+        public static final Trigger kSim =
+                new Trigger(
+                        () -> {
+                            return currentMode.equals(Mode.SIM);
+                        });
+        public static final Trigger kReplay =
+                new Trigger(
+                        () -> {
+                            return currentMode.equals(Mode.REPLAY);
+                        });
+    }
 
-  public static final double kLoopSpeed = Units.millisecondsToSeconds(20);
+    public static final double kLoopSpeed = Units.millisecondsToSeconds(20);
 
-  public static final boolean kIsTuningMode = true;
+    public static final boolean kIsTuningMode = true;
 
-  public static RobotConfig config;
+    public static RobotConfig config;
 
-  public static double kTurretAngleMultiplier = 0.07;
+    public static double kTurretAngleMultiplier = 0.07;
 
-  public static boolean disableHAL = false;
+    public static boolean disableHAL = false;
 
-  public static void disableHAL() {
-    disableHAL = true;
-  }
+    public static void disableHAL() {
+        disableHAL = true;
+    }
 
-  public static class DriverConstants {
-    public static final int kDriverJoystickPort = 0;
-    public static final int kOperatorJoystickPort = 1;
-    public static final double kDriverControllerJoystickDeadzone = 0.0;
-    public static final double kDriverControllerRotationalControlJoystickDeadzone = 0.05;
-  }
+    public static class DriverConstants {
+        public static final int kDriverJoystickPort = 0;
+        public static final int kOperatorJoystickPort = 1;
+        public static final double kDriverControllerJoystickDeadzone = 0.0;
+        public static final double kDriverControllerRotationalControlJoystickDeadzone = 0.05;
+    }
 }

@@ -1,10 +1,4 @@
-// Copyright (c) 2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project.
-
+/* (C)2025-2026 */
 package team5427.lib.tunableControls;
 
 import java.util.Arrays;
@@ -101,11 +95,11 @@ public class LoggedTunableNumber implements DoubleSupplier {
      *     inputted in method
      * @param tunableNumbers All tunable numbers to check
      */
-    public static void ifChanged(int id, Consumer<double[]> action, LoggedTunableNumber... tunableNumbers) {
+    public static void ifChanged(
+            int id, Consumer<double[]> action, LoggedTunableNumber... tunableNumbers) {
         if (Arrays.stream(tunableNumbers).anyMatch(tunableNumber -> tunableNumber.hasChanged(id))) {
-            action.accept(Arrays.stream(tunableNumbers)
-                    .mapToDouble(LoggedTunableNumber::get)
-                    .toArray());
+            action.accept(
+                    Arrays.stream(tunableNumbers).mapToDouble(LoggedTunableNumber::get).toArray());
         }
     }
 

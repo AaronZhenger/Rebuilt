@@ -1,3 +1,4 @@
+/* (C)2026 */
 package team5427.frc.robot.commands.chassis;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,53 +13,55 @@ import team5427.frc.robot.subsystems.Swerve.SwerveSubsystem;
 
 public class RawChassisMovement extends Command {
 
-  private SwerveSubsystem swerveSubsystem;
-  private CommandXboxController joy;
+    private SwerveSubsystem swerveSubsystem;
+    private CommandXboxController joy;
 
-  private TunedJoystick translationJoystick;
-  private TunedJoystick rotationJoystick;
+    private TunedJoystick translationJoystick;
+    private TunedJoystick rotationJoystick;
 
-  public RawChassisMovement(CommandXboxController driverJoystick) {
-    swerveSubsystem = SwerveSubsystem.getInstance();
-    joy = driverJoystick;
-    translationJoystick = new TunedJoystick(joy.getHID());
-    translationJoystick.useResponseCurve(ResponseCurve.LINEAR);
+    public RawChassisMovement(CommandXboxController driverJoystick) {
+        swerveSubsystem = SwerveSubsystem.getInstance();
+        joy = driverJoystick;
+        translationJoystick = new TunedJoystick(joy.getHID());
+        translationJoystick.useResponseCurve(ResponseCurve.LINEAR);
 
-    rotationJoystick = new TunedJoystick(joy.getHID());
-    rotationJoystick.useResponseCurve(ResponseCurve.LINEAR);
+        rotationJoystick = new TunedJoystick(joy.getHID());
+        rotationJoystick.useResponseCurve(ResponseCurve.LINEAR);
 
-    translationJoystick.setDeadzone(DriverConstants.kDriverControllerJoystickDeadzone);
-    rotationJoystick.setDeadzone(DriverConstants.kDriverControllerJoystickDeadzone);
-    addRequirements(swerveSubsystem);
-  }
-
-  @Override
-  public void execute() {
-    if (DriverStation.isTeleop()) {
-      double vx = -translationJoystick.getRightY();
-      double vy = -translationJoystick.getRightX();
-      double omegaRadians = -rotationJoystick.getLeftX();
-
-      double dampener = (joy.getRightTriggerAxis() * SwerveConstants.kDampenerDampeningAmount);
-
-      ChassisSpeeds driverSpeeds = swerveSubsystem.getDriveSpeeds(vx, vy, omegaRadians, dampener);
-
-      if (joy.getLeftTriggerAxis() >= 0.1) {
-        driverSpeeds = new ChassisSpeeds(0, 0, 0);
-      }
-      swerveSubsystem.setInputSpeeds(driverSpeeds);
-    } else {
-      swerveSubsystem.setInputSpeeds(new ChassisSpeeds(0, 0, 0));
+        translationJoystick.setDeadzone(DriverConstants.kDriverControllerJoystickDeadzone);
+        rotationJoystick.setDeadzone(DriverConstants.kDriverControllerJoystickDeadzone);
+        addRequirements(swerveSubsystem);
     }
-  }
 
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    @Override
+    public void execute() {
+        if (DriverStation.isTeleop()) {
+            double vx = -translationJoystick.getRightY();
+            double vy = -translationJoystick.getRightX();
+            double omegaRadians = -rotationJoystick.getLeftX();
 
-  @Override
-  public void end(boolean interrupted) {
-    swerveSubsystem.setInputSpeeds(new ChassisSpeeds());
-  }
+            double dampener =
+                    (joy.getRightTriggerAxis() * SwerveConstants.kDampenerDampeningAmount);
+
+            ChassisSpeeds driverSpeeds =
+                    swerveSubsystem.getDriveSpeeds(vx, vy, omegaRadians, dampener);
+
+            if (joy.getLeftTriggerAxis() >= 0.1) {
+                driverSpeeds = new ChassisSpeeds(0, 0, 0);
+            }
+            swerveSubsystem.setInputSpeeds(driverSpeeds);
+        } else {
+            swerveSubsystem.setInputSpeeds(new ChassisSpeeds(0, 0, 0));
+        }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        swerveSubsystem.setInputSpeeds(new ChassisSpeeds());
+    }
 }

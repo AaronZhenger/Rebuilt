@@ -1,3 +1,4 @@
+/* (C)2026 */
 package team5427.frc.robot.subsystems.intake.io.sim;
 
 import static edu.wpi.first.units.Units.Grams;
@@ -12,17 +13,17 @@ import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 
 public class RebuiltBall extends GamePieceOnFieldSimulation {
 
-  public static final GamePieceInfo kRebuiltBallInfo =
-      new GamePieceInfo(
-          "Ball",
-          Geometry.createCircle(Units.inchesToMeters(5.91) / 2),
-          Inches.of(5.91),
-          Grams.of(210),
-          3.5,
-          5,
-          0.3);
+    public static final GamePieceInfo kRebuiltBallInfo =
+            new GamePieceInfo(
+                    "Ball",
+                    Geometry.createCircle(Units.inchesToMeters(5.91) / 2),
+                    Inches.of(5.91),
+                    Grams.of(210),
+                    3.5,
+                    5,
+                    0.3);
 
-  public RebuiltBall(Translation2d initialPosition) {
-    super(kRebuiltBallInfo, new Pose2d(initialPosition, new Rotation2d()));
-  }
+    public RebuiltBall(Translation2d initialPosition) {
+        super(kRebuiltBallInfo, new Pose2d(initialPosition, new Rotation2d()));
+    }
 }
